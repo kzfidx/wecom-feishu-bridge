@@ -1,0 +1,38 @@
+name = "wecom-feishu-bridge"
+main = "src/app.js"
+compatibility_date = "2023-07-26"
+
+# 构建配置
+[build]
+command = "npm run build"
+dev_command = "npm run dev"
+
+# KV命名空间配置
+[[kv_namespaces]]
+binding = "KV_STORAGE"
+# 注意：部署前需要通过wrangler命令创建KV命名空间并更新ID
+
+# 环境变量配置 - 这些值不应硬编码，应通过wrangler secret命令设置
+[vars]
+LOG_LEVEL = "info"
+
+# 开发环境配置
+[env.dev]
+name = "wecom-feishu-bridge-dev"
+[env.dev.vars]
+LOG_LEVEL = "debug"
+
+# 生产环境配置
+[env.production]
+name = "wecom-feishu-bridge-production"
+[env.production.vars]
+LOG_LEVEL = "info"
+
+# 路由配置 - 部署时会自动生成或可在Cloudflare控制台配置
+
+# 兼容性标志
+compatibility_flags = ["nodejs_compat"]
+
+# 其他配置
+workers_dev = true
+minify = true

@@ -1,0 +1,79 @@
+# 依赖目录
+node_modules/
+
+# 环境变量文件
+.env
+.env.*
+!.env.example
+
+# 构建输出目录
+dist/
+build/
+
+# 临时文件
+tmp/
+*.tmp
+*.temp
+.cache/
+
+# 日志文件
+*.log
+logs/
+
+# 编辑器文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# Cloudflare Workers开发相关
+.wrangler/
+wrangler-state.json
+
+# 类型定义生成文件
+*.tsbuildinfo
+
+# 调试文件
+debug-*.js
+
+# 本地配置文件
+local-config.js
+
+# 项目生成但不需要提交的文档
+项目文档-
+初期方案.md
+
+# 临时测试脚本
+test-*.js
+
+# 开发工具目录
+.trae/
+
+# SDD开发相关文档（不需要提交到公开仓库）
+tmp/方案分析-*
+tmp/分解步骤-*
+tmp/*.md
+specs/
+plans/
+project/
+tasks.md
+
+# 测试目录（不需要在生产环境中）
+tests/
+
+# 开发配置文件（不需要在生产环境中）
+jsconfig.json
+tsconfig.json
+jest.config.js
+.eslintrc.js
+.prettierrc.js
+babel.config.js
