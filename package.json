@@ -5,9 +5,12 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "wrangler dev",
+    "build": "echo \"Skipping build step\"",
     "deploy": "wrangler deploy",
     "test": "jest",
-    "format": "prettier --write '**/*.{js,json,md}'"
+    "lint": "prettier --check \"**/*.{js,json,md}\"",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "wrangler:dry": "wrangler deploy --dry-run"
   },
   "dependencies": {
     "crypto-js": "^4.1.1",

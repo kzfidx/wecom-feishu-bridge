@@ -1,5 +1,5 @@
 name = "wecom-feishu-bridge"
-main = "src/app.js"
+main = "src/index.js"
 compatibility_date = "2023-07-26"
 
 # 构建配置
