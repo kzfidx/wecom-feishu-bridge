@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test-wrangler:
+    name: Lint, Test, and Wrangler Dry Run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: |
+          npm run lint || (echo "::error title=Lint failed::Run 'npm run format' locally to fix formatting issues." && exit 1)
+
+      - name: Run tests
+        env:
+          CI: true
+          NODE_OPTIONS: --experimental-vm-modules
+        run: |
+          npm test -- --ci --reporters=default || (echo "::error title=Tests failed::One or more tests failed. See logs for details." && exit 1)
+
+      - name: Wrangler deploy dry run
+        run: |
+          npm run wrangler:dry || (echo "::error title=Wrangler dry-run failed::See logs above for details." && exit 1)
