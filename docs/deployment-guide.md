@@ -26,19 +26,18 @@
 
 ## 环境变量配置
 
-编辑 `wrangler.toml` 文件，填入相应的环境变量值：
+编辑 `wrangler.toml` 或通过 `wrangler secret put` 设置下列环境变量：
 
 - 企业微信配置：
-  - `WECOM_CORPID`: 企业微信 CorpID
-  - `WECOM_AGENTID`: 企业微信应用 AgentID
-  - `WECOM_SECRET`: 企业微信应用密钥
-  - `WECOM_ENCODING_AESKEY`: 消息加密密钥
+  - `WECOM_CORP_ID`: 企业微信 CorpID
+  - `WECOM_CORP_SECRET`: 企业微信应用密钥
+  - `WECOM_ENCODING_AES_KEY`: 消息加密密钥
   - `WECOM_TOKEN`: 消息校验 Token
 
 - 飞书配置：
   - `FEISHU_APP_ID`: 飞书应用 ID
   - `FEISHU_APP_SECRET`: 飞书应用密钥
-  - `FEISHU_ENCRYPT_KEY`: 消息加密密钥
+  - `FEISHU_ENCRYPT_KEY`: 消息加密密钥（如使用事件加密）
   - `FEISHU_VERIFICATION_TOKEN`: 事件订阅校验 Token
 
 ## 本地开发
@@ -52,13 +51,13 @@
 ## 部署到开发环境
 
 ```bash
-wrangler publish --env dev
+wrangler deploy --env dev
 ```
 
 ## 部署到生产环境
 
 ```bash
-wrangler publish --env production
+wrangler deploy --env production
 ```
 
 ## 验证部署

@@ -21,21 +21,55 @@
 
 ```
 src/
-├── index.js           # 主入口文件
-├── app.js             # 应用主类
+├── index.js           # Workers 入口（export default { fetch }）
+├── app.js             # 应用主类与路由
 ├── modules/           # 功能模块
-│   ├── feishu-connector.js      # 飞书API连接器
-│   ├── wecom-connector.js       # 企业微信API连接器
-│   ├── message-transformer.js   # 消息格式转换器
-│   ├── config-manager.js        # 配置管理器
-│   └── error-handler.js         # 错误处理器
+│   ├── feishu-connector.js
+│   ├── wecom-connector.js
+│   ├── message-transformer.js
+│   ├── channel-mapping.js
+│   ├── config-manager.js
+│   ├── config-storage.js
+│   ├── wecom-signature-verifier.js
+│   ├── feishu-signature-verifier.js
+│   ├── file-downloader.js
+│   ├── file-uploader.js
+│   ├── file-storage.js
+│   ├── encryption-service.js
+│   ├── error-handler.js
+│   └── logger.js
 └── utils/             # 工具类
-    ├── crypto.js                # 加密工具
-    ├── validator.js             # 验证工具
-    ├── rate-limiter.js          # 限流工具
-    ├── file-optimizer.js        # 文件优化工具
-    └── monitoring.js            # 监控和日志工具
+    ├── rate-limiter.js
+    ├── retry-service.js
+    ├── message-transformer.js
+    ├── file-optimizer.js
+    └── monitoring.js
 ```
+
+## 消息流概览
+
+- 企业微信 -> 飞书：
+  1. 企业微信以GET方式请求 /wecom/callback 完成URL校验（msg_signature/timestamp/nonce/echostr）
+  2. 企业微信以POST方式推送加密XML消息到 /wecom/callback
+  3. WeCom签名校验与解密（wecom-connector / wecom-signature-verifier）
+  4. 通过通道映射解析目标（KV 或环境配置，见 docs/channel-mapping-guide.md）
+  5. 使用 message-transformer 转换为飞书格式；大文件走文件下载/上传模块
+  6. 应用限流与重试策略（rate-limiter/retry-service），通过 feishu-connector 发送
+  7. 返回企业微信成功XML应答
+
+- 飞书 -> 企业微信：
+  1. 飞书向 /feishu/event 发送事件（URL 验证 challenge 与事件回调）
+  2. 校验事件签名（feishu-signature-verifier）并解析事件
+  3. 通过通道映射确定目标企业微信通道
+  4. 使用 message-transformer 转换为企业微信消息；必要时进行文件中转
+  5. 应用限流/重试后经 wecom-connector 发送
+  6. 返回 JSON { code: 0, msg: 'success' }
+
+- 实时与运维：
+  - /websocket 提供简单的实时连通性与测试消息能力
+  - /health 与 /config 用于健康检查与配置查看（敏感信息已遮蔽）
+
+更多细节见 docs/message-flow.md。
 
 ## 技术栈
 
@@ -43,7 +77,7 @@ src/
 - **编程语言**：JavaScript (ES Modules)
 - **HTTP客户端**：Fetch API
 - **WebSocket支持**：Cloudflare WebSocket API
-- **测试框架**：Vitest
+- **测试框架**：Jest
 - **部署工具**：Wrangler CLI
 
 ## 快速开始
@@ -201,14 +235,20 @@ POST /feishu/event
 ## 测试
 
 ```bash
-# 运行所有测试
+# 运行所有测试（Jest）
 npm test
 
-# 运行特定测试文件
-npm test utils/rate-limiter.test.js
+# 按名称运行测试用例
+npm test -- -t "RateLimiter"
 
-# 运行特定测试套件
-npm test -- -t "RateLimiter类测试"
+# 仅运行特定文件
+npx jest src/utils/rate-limiter.test.js
+
+# 监听模式（TDD 体验）
+npm test -- --watch
+
+# 生成覆盖率报告
+npm test -- --coverage
 ```
 
 ## 错误排查
@@ -221,18 +261,27 @@ npm test -- -t "RateLimiter类测试"
 
 ## 文档资源
 
-### 配置指南
-- [部署指南](https://github.com/kzifdx/wecom-feishu-bridge/blob/main/docs/deployment-guide.md)
-- [企业微信配置指南](https://github.com/kzifdx/wecom-feishu-bridge/blob/main/docs/wecom-config-guide.md)
-- [飞书配置指南](https://github.com/kzifdx/wecom-feishu-bridge/blob/main/docs/feishu-config-guide.md)
-- [通道映射配置指南](https://github.com/kzifdx/wecom-feishu-bridge/blob/main/docs/channel-mapping-guide.md)
-- [API文档](https://github.com/kzifdx/wecom-feishu-bridge/blob/main/docs/api-documentation.md)
+### 配置与架构
+- [消息流细节](docs/message-flow.md)
+- [部署指南](docs/deployment-guide.md)
+- [企业微信配置指南](docs/wecom-config-guide.md)
+- [飞书配置指南](docs/feishu-config-guide.md)
+- [通道映射配置指南](docs/channel-mapping-guide.md)
+- [API文档](docs/api-documentation.md)
+- [测试指南（Jest）](docs/testing.md)
 
 ### 官方文档
 - [企业微信开发文档](https://developer.work.weixin.qq.com/document/path/90600)
 - [飞书开发文档](https://open.feishu.cn/document/)
 - [Cloudflare Workers文档](https://developers.cloudflare.com/workers/)
 - [Wrangler CLI文档](https://developers.cloudflare.com/workers/wrangler/)
+
+### 后续改进（低优先级）
+- 完善签名验证与加解密实现，替换当前占位/简化逻辑
+- 统一配置管理与通道映射的存储（KV 与环境变量的取舍）
+- 增加端到端集成测试与更多消息类型的单元测试覆盖
+- 为管理端点（/api/*）增加鉴权与访问控制
+- 更丰富的监控指标与可视化（消息延迟、错误分布、重试统计）
 
 ## 许可证
 

@@ -40,7 +40,7 @@
 1. 在应用详情页面，点击「事件订阅」
 2. 点击「设置」按钮
 3. 填写以下信息：
-   - **请求地址 URL**：`https://your-worker-name.workers.dev/feishu`
+   - **请求地址 URL**：`https://your-worker-name.workers.dev/feishu/event`
    - **请求方法**：选择「POST」
    - **验证令牌 Verification Token**：随机生成的字符串（需与桥接服务中的`FEISHU_VERIFICATION_TOKEN`环境变量一致）
    - **加密密钥 Encrypt Key**：随机生成的字符串（需与桥接服务中的`FEISHU_ENCRYPT_KEY`环境变量一致）
