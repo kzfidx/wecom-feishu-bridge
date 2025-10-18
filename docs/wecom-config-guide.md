@@ -35,10 +35,10 @@
 1. 在应用详情页面，找到「接收消息」设置
 2. 点击「设置API接收」
 3. 填写以下信息：
-   - **URL**：`https://your-worker-name.workers.dev/wecom`
+   - **URL**：`https://your-worker-name.workers.dev/wecom/callback`
    - **Token**：随机生成的字符串（需与桥接服务中的`WECOM_TOKEN`环境变量一致）
-   - **EncodingAESKey**：点击「随机生成」按钮获取（需与桥接服务中的`WECOM_ENCODING_AESKEY`环境变量一致）
-   - **数据格式**：选择「JSON」
+   - **EncodingAESKey**：点击「随机生成」按钮获取（需与桥接服务中的`WECOM_ENCODING_AES_KEY`环境变量一致）
+   - **数据格式**：选择「XML」
 4. 点击「保存」
 5. 系统会自动进行URL验证，请确保桥接服务已正常运行
 
